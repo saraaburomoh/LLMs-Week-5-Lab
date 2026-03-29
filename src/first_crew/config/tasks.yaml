@@ -1,0 +1,32 @@
+analyze_user_task:
+  description: >
+    Use the search_user_data tool to find user {user_id}'s profile.
+    Then use search_review_data to find their past reviews.
+    Compile a comprehensive analysis report in Markdown format including
+    name, review_count, average_stars, and food preferences.
+  expected_output: >
+    A comprehensive Markdown report summarizing user {user_id}'s
+    profile, reviewing habits, and food preferences.
+  agent: user_profiler
+
+analyze_item_task:
+  description: >
+    Use the search_item_data tool to find business {item_id}'s features.
+    Generate a detailed evaluation report including name, location,
+    categories, attributes, and overall star rating.
+  expected_output: >
+    A detailed Markdown evaluation report for business {item_id}
+    including name, categories, location, and overall stars.
+  agent: item_analyst
+
+predict_review_task:
+  description: >
+    Based on the user profile and business reports provided,
+    predict the star rating and write a realistic review text.
+    Output MUST be a JSON Object with exactly two fields:
+    "stars" (a number between 1 and 5) and
+    "text" (a realistic review string).
+    This format is required for MAE score calculation.
+  expected_output: >
+    {"stars": 4.5, "text": "The mock review text here..."}
+  agent: prediction_modeler

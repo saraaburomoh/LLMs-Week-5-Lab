@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+env/
+venv/
+ENV/
+
+# Environment Variables
+.env
+
+# IDEs
+.vscode/
+.idea/
+
+# UV
+uv.lock
+
+# Test & Reports
+.pytest_cache/
+
+# Local Data (Subset files are included, but others are ignored)
+# data/ (Uncomment this if you want to hide the data/ folder entirely)

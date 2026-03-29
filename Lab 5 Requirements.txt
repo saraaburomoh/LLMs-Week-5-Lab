@@ -1,0 +1,164 @@
+# Lab: Agents equipped with external knowledge
+
+---
+
+## Step 1: Understanding Objectives and Datasets
+
+**Goal Analysis:**
+
+In the final project (AgentSociety Challenge (Milestone 1)), our task is to develop a **Static Baseline** system. By extracting specific `user_id` and `item_id` pairs from the test dataset, we enable the Agent to analyze the historical data associated with both entities. Ultimately, the system must predict the **Star Rating** the user would give and synthesize the **Review Text** they would write.
+
+https://www.youtube.com/watch?v=n3RKsY2H-NE
+
+**Dataset Roles:**
+
+- **Test Entry** (`data/test_review_subset.json`): Think of this as the **"Exam Paper."** It is responsible for providing the input pairs (`{user_id}` and `{item_id}`) that we need to solve.
+- **Retrieval Memory Bank** (`user_subset.json`, `item_subset.json`, `review_subset.json`): This acts as the Agent's **"Reference Library."** Agents can proactively query these files to piece together detailed **User Personas** and **Business Characteristics**.
+- Files Download: (Updated)
+    
+    https://drive.google.com/drive/folders/1d6n7ddITmGB-TIufKtdkG_jy2_TDYR7U?usp=sharing
+    
+
+---
+
+## Step 2: Injecting Global Background Knowledge (CrewAI Knowledge)
+
+**Why is Knowledge Injection Necessary?**
+Yelp’s JSON files contain many domain-specific key fields (such as `useful`, `funny`, and `compliment_hot`). If a Large Language Model (LLM) processes these JSON files directly without context, it may misinterpret the field meanings and produce hallucinations.
+
+**Implementation:**
+We utilize CrewAI’s `StringKnowledgeSource` or `MDTextKnowledgeSource` to ingest our prepared `docs/Yelp Data Translation.md` file, transforming it into a shared "knowledge dictionary" for all agents. Once configured via the `@crew(knowledge_sources=[...])` decorator, every agent will implicitly understand the specific definitions and nuances of the dataset.
+
+https://docs.google.com/document/d/1Ifayc6nUsoUwiRx5J5KghMPUdCdoJ4XMgDSoFt6O8d0/edit?usp=sharing
+
+---
+
+## Step 3: Equipping Active Retrieval Weapons (CrewAI RAG Tools)
+
+**Why is RAG Necessary?**
+Yelp data subsets can easily reach several megabytes in size. Forcing this entire volume of data directly into an Agent's prompt would cause token counts to skyrocket, likely leading to context window overflow or system crashes.
+
+**Implementation:**
+We equip our Agents with a "weapon" known as the `JSONSearchTool` (a RAG Tool).
+
+- Specialized Rag Tool for JSON:
+    
+    https://docs.crewai.com/en/tools/file-document/jsonsearchtool#json-rag-search
+    
+- **user_analyst**: Granted permissions to query the user database (`user_subset.json`) and the review database (`review_subset.json`).
+- **item_analyst**: Granted permission to query the business/entity database (`item_subset.json`).
+
+This setup allows the Agents to "proactively" execute queries during task execution to retrieve specific, relevant nodes from the JSON tree rather than processing the entire file at once.
+
+---
+
+## Step 4: Strictly Separated Agent Definitions (`agents.yaml`)
+
+Following our development best practices, we avoid hardcoding responsibilities and logic directly within Python files. Instead, we define three AI roles with a clear division of labor in `config/agents.yaml`:
+
+1. **User Profiler**: Responsible for summarizing the consumer’s preferences (e.g., their favorite cuisines and whether they tend to be a strict or lenient reviewer).
+2. **Item Analyst**: Responsible for extracting the key characteristics of the restaurant (e.g., signature dishes and common customer complaints).
+3. **Prediction Modeler**: The "lead strategist" who synthesizes the reports provided by the first two agents to make a comprehensive judgment, ultimately generating the simulated output.
+
+## Step 5: Strictly Separated Task Definitions (`tasks.yaml`)
+
+The three corresponding tasks are defined in `config/tasks.yaml`, using detailed descriptions to guide the Agents' actions and dictate their expected outputs.
+
+1. **`analyze_user_task`**: Instructs the agent to use the `{user_id}` to search through the retrieval library and compile a comprehensive analysis report in Markdown format.
+2. **`analyze_item_task`**: Instructs the agent to use the `{item_id}` to query the retrieval library and generate a detailed evaluation report for the specific business.
+3. **`predict_review_task`**: Strictly mandates that the final output must be a **JSON Object** containing exactly two fields: `"stars"` and `"text"`. This format is critical, as it is the exact structure **OpenEvolve** requires to parse the data and calculate the **MAE (Mean Absolute Error)** score.
+
+---
+
+## Step 6: System Assembly and Tool Binding (`crew.py`)
+
+In `src/first_crew/crew.py`, our primary focus is on **equipping the team**:
+
+- **@agent Decorator**: We load the definitions from the YAML files and use the `tools=[user_rag_tool]` parameter within the Python code to mount specific RAG tools to their respective agents.
+- **@task Decorator**: We import the task definitions and utilize the `output_file='report.json'` parameter to save the final results generated by the Prediction Modeler.
+- **Crew() Constructor**: We inject the `knowledge_sources` prepared in **Step 2**. This ensures the entire Crew operates with the same underlying background knowledge throughout the workflow.
+
+---
+
+## Step 7: Test Execution Script (`main.py`)
+
+To verify that the system operates smoothly, we modified the entry point in `src/first_crew/main.py`:
+
+1. It directly reads the `data/test_review_subset.json` file.
+2. It extracts the `user_id` and `item_id` from the first row (the first test case) of the data.
+3. These two values are passed as `inputs` into the CrewAI `kickoff()` method.
+
+If the configuration is correct, you will see the Agents communicating with each other in the console, eventually producing the `report.json` output.
+
+## Tips:
+
+1. Leverage AntiGravity or other Vibe coding Platform and study CrewAI References
+    
+    https://codelabs.developers.google.com/getting-started-google-antigravity#0
+    
+2. Use your Cohere Key again 
+    
+    https://cohere.com/
+    
+
+```python
+from crewai.rag.embeddings.providers.cohere.types import CohereProviderSpec
+
+embedding_model: CohereProviderSpec = {
+    "provider": "cohere",
+    "config": {
+        "api_key": "your-api-key",
+        "model_name": "embed-english-v3.0"
+    }
+}
+```
+
+1. JSON Knowledge Source
+
+```python
+from crewai.knowledge.source.json_knowledge_source import JSONKnowledgeSource
+
+json_source = JSONKnowledgeSource(
+    file_paths=["data.json"]
+)
+```
+
+
+# LLM& APP W5 Lab/Homework: Crew_with_RAG
+
+## Goal:
+
+- Design a agent crew based on the previous **researcher-reporting_analyst** crew, which can predict the rating/reviews of an arbitrary user-item pair $(u,i)$ selected from `test_review_subset.json.`  by utilizing `user_subset.json` , `item_subset.jsonl`  and `review_subset.json`  and other analysis results as agents’ **RAG tools / knowledge.**
+    - Crew Input format :
+    - 
+        
+        ```jsx
+        {
+        "user_id": "LQUk3WFBgEfwIYkNDh5l1Q",
+        "item_id": "KueYmi7Vrr0Hyt0_iIux4Q"
+        }
+        ```
+        
+    - Crew Output format:
+        
+        ```
+        {
+          "stars": 4.5,
+          "review": "The mock review text here..."
+        }
+        ```
+        
+    - Please note  `test_review_subset.json`  should only be use to test the result of your crew, and S**HOULD NOT** be use during the crew building.
+    
+    - The complete training set is here for people who want to conduct more analysis 😉
+        - https://drive.google.com/drive/folders/1-q38FSaO0RMarM0iEvTbjBFQMv4ZbnvB?usp=sharing
+
+## Submission (Deadline: Midnight Next Monday (3/30 24:00))
+
+- Recommend:
+    - Please push your repo. (which contains all codes) to GitHub, and invite me (GitHub account: **yuchieh**) as your Collaborator.
+    - Create a Google Doc in this [folder](https://drive.google.com/drive/folders/1Gp6mdgvw5UjjGUcVRTWOaJGR96qPRlpl?usp=sharing) with the filename format **[Name_StudentID]** and paste your repository link inside.
+    - **Done!**
+- If you are not familiar with GitHub yet (highly recommend creating your account with AI today)
+    - Please ZIP your repo. and upload to your google drive.
+    - Create a Google Doc in this [folder](https://drive.google.com/drive/folders/1Gp6mdgvw5UjjGUcVRTWOaJGR96qPRlpl?usp=sharing) with the filename format **[Name_StudentID]** and paste your zip file link inside.
