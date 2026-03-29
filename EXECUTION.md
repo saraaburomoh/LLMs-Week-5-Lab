@@ -413,18 +413,3 @@ Tool search_item_data executed with result: {"item_id": "-7GjicSH_rM8JeZGCXGcUg"
   "stars": 4.0,
   "text": "Double Decker offers a casual atmosphere with a full bar and some great happy hour deals. The ambiance is lively, especially on weekends when the place gets packed. I've visited a few times for drinks and small bites, and it's always enjoyable. However, the noise level can be quite high, which might not be ideal if you're looking for a quiet spot to chat. Overall, it’s a solid choice for a night out with friends or colleagues."
 }
-```
-
-╭───────────────────────────────────────────────────────────────────────────────────────────── Tracing Status ──────────────────────────────────────────────────────────────────────────────────────────────╮
-│                                                                                                                                                                                                           │
-│  Info: Tracing is disabled.                                                                                                                                                                               │
-│                                                                                                                                                                                                           │
-│  To enable tracing, do any one of these:                                                                                                                                                                  │
-│  • Set tracing=True in your Crew/Flow code                                                                                                                                                                │
-│  • Set CREWAI_TRACING_ENABLED=true in your project's .env file                                                                                                                                            │
-│  • Run: crewai traces enable                                                                                                                                                                              │
-│                                                                                                                                                                                                           │
-╰───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
-
-C:\Users\MCC\finalnew>
-```
