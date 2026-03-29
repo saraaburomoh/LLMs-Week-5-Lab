@@ -150,15 +150,3 @@ json_source = JSONKnowledgeSource(
         
     - Please note  `test_review_subset.json`  should only be use to test the result of your crew, and S**HOULD NOT** be use during the crew building.
     
-    - The complete training set is here for people who want to conduct more analysis 😉
-        - https://drive.google.com/drive/folders/1-q38FSaO0RMarM0iEvTbjBFQMv4ZbnvB?usp=sharing
-
-## Submission (Deadline: Midnight Next Monday (3/30 24:00))
-
-- Recommend:
-    - Please push your repo. (which contains all codes) to GitHub, and invite me (GitHub account: **yuchieh**) as your Collaborator.
-    - Create a Google Doc in this [folder](https://drive.google.com/drive/folders/1Gp6mdgvw5UjjGUcVRTWOaJGR96qPRlpl?usp=sharing) with the filename format **[Name_StudentID]** and paste your repository link inside.
-    - **Done!**
-- If you are not familiar with GitHub yet (highly recommend creating your account with AI today)
-    - Please ZIP your repo. and upload to your google drive.
-    - Create a Google Doc in this [folder](https://drive.google.com/drive/folders/1Gp6mdgvw5UjjGUcVRTWOaJGR96qPRlpl?usp=sharing) with the filename format **[Name_StudentID]** and paste your zip file link inside.
