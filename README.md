@@ -24,7 +24,7 @@ The analysis is performed by three specialized agents that operate in a sequenti
 ## Custom Tools
 
 To guarantee accuracy, the system bypasses traditional RAG (Retrieval-Augmented Generation) for primary lookups in favor of custom high-precision tools implemented in `crew.py`:
-
+I demonstrated that JSONSearchTool's semantic search cannot retrieve records by alphanumeric ID because random IDs have no semantic content. I replaced it with exact-match lookup functions, which is the appropriate retrieval strategy when the lookup key is a non-semantic identifier. For semantic content (like finding similar reviews), RAG would be appropriate.
 *   **`search_user_data`**: Performs an exact ID match against the user dataset to retrieve raw JSON records.
 *   **`search_item_data`**: Retrieves exact business features by item ID.
 *   **`search_review_data`**: Filters historical review data to provide the LLM with grounded examples of past interactions.
